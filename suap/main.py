@@ -9,7 +9,6 @@ class ProjectType(StrEnum):
     CARGO = "cargo"
 
 class Platform(StrEnum):
-    LINUX = "linux"
     WINDOWS = "windows"
     MACOS = "macos"
 
