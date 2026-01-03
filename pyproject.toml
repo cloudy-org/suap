@@ -4,4 +4,6 @@ version = "0.1.0"
 description = "A tool to help us with cross-platform deployment."
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = []
+dependencies = [
+    "typer>=0.21.0",
+]
