@@ -1,8 +1,8 @@
 <div align="center">
 
-  # suap
+  # 📦 suap
 
-  <sub>📦 Shut Up And Package — A tool to help us with cross-platform deployment. </sub>
+  <sub>*Just **S**hut **U**p **A**nd **P**ackage it, bloody hell mate...*</sub>
 
 </div>
 
