@@ -6,4 +6,7 @@
 
 </div>
 
-*Work In Progress...*
+> [!WARNING]
+> DO NOT use suap as a tool for building and installing cloudy-org applications, that is not the intent of the tool. For application setup / installation check the application's own instructions via it's `README.md` file.
+
+*Readme Work In Progress...*
