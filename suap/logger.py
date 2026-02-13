@@ -1,8 +1,6 @@
 import logging
 
-__all__ = (
-    "LogFormatter",
-)
+__all__ = ()
 
 class LogFormatter(logging.Formatter):
     COLOURS = {
@@ -14,9 +12,12 @@ class LogFormatter(logging.Formatter):
     }
 
     def format(self, record):
+        file_path = record.name.replace("suap.", "")
+
+        gray_colour = "\033[90m"
         reset_colour = "\033[0m"
 
         colour = self.COLOURS.get(record.levelno, reset_colour)
-        formatted_string = f"{colour}[%(levelname)s]{reset_colour}: %(message)s"
+        formatted_string = f"[{colour}%(levelname)s{reset_colour}:{gray_colour}{file_path}{reset_colour}] %(message)s"
 
         return logging.Formatter(formatted_string).format(record)
