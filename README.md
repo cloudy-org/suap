@@ -11,5 +11,6 @@
 
 > [!NOTE]
 > As the main usage of suap is in CI, we only target supporting Python **3.13**.
+> Also currently the tool is Linux only, that may or may not change.
 
 *Readme Work In Progress...*

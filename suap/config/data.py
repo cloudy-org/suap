@@ -4,16 +4,16 @@ __all__ = (
     "ConfigData",
 )
 
-CargoProjectData = TypedDict(
-    "CargoProjectData",
+ConfigCargoProjectData = TypedDict(
+    "ConfigCargoProjectData",
     {
         "bin-crate": str
     }
 )
 
-class ProjectData(TypedDict):
-    cargo: CargoProjectData
+class ConfigProjectData(TypedDict):
+    cargo: ConfigCargoProjectData
 
 class ConfigData(TypedDict):
     version: int
-    project: ProjectData
+    project: ConfigProjectData

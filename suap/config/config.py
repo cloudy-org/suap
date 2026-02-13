@@ -16,6 +16,10 @@ def get_config_data(project_root_dir: Path) -> Optional[ConfigData]:
     config_path = project_root_dir.joinpath("suap.toml")
 
     if not config_path.exists():
+        logger.error(
+            "'suap.toml' does not exist in this current " \
+                f"working directory! (Project Root: {project_root_dir})"
+        )
         return None
 
     config_data: ConfigData = {}

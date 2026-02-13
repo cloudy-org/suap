@@ -1,33 +1,24 @@
 from typing import Annotated, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from config.data import ProjectData
+    from config.data import ConfigProjectData
 
 import os
+import shutil
 import logging
-from enum import StrEnum
 from pathlib import Path
+from subprocess import Popen
 from typer import Option, Typer, Exit
 
 from .config import get_config_data
-from .projects import get_cargo_project_data
+from .project_type import ProjectType
+from .platform_format import PlatformFormat
+from .projects import ProjectData, find_and_get_cargo_project_data, build_cargo_project, get_cargo_toolchain
 
 __all__ = ()
 
 app = Typer()
 logger = logging.getLogger(__name__)
-
-class ProjectType(StrEnum):
-    CARGO = "cargo"
-
-class PlatformFormat(StrEnum):
-    LINUX = "linux"
-
-    WINDOWS = "windows"
-    WINDOWS_BINARY = "windows-bin"
-    WINDOWS_SETUP = "windows-setup"
-
-    MACOS = "macos"
 
 @app.command()
 def package(
@@ -54,14 +45,10 @@ def package(
     config_data = get_config_data(current_working_directory)
 
     if config_data is None:
-        logger.error(
-            "'suap.toml' does not exist in current working " \
-                f"directory! (CWD: {current_working_directory})"
-        )
         raise Exit(1)
 
     if project == ProjectType.CARGO:
-        projects_data: Optional[ProjectData] = config_data.get("project", None)
+        projects_data: Optional[ConfigProjectData] = config_data.get("project", None)
 
         cargo_crate_name: Optional[str] = None
 
@@ -76,13 +63,73 @@ def package(
             raise Exit(1)
 
         logger.info("Getting cargo project data...")
-        project_data = get_cargo_project_data(cargo_crate_name)
+        project_data = find_and_get_cargo_project_data(cargo_crate_name)
 
         if project_data is None:
             raise Exit(1)
 
+        toolchain_name = get_cargo_toolchain(platform_format)
+
+        if toolchain_name is None:
+            logger.error(
+                "We don't support a cargo toolchain for this " \
+                    f"platform format ({platform_format.name}) yet!"
+            )
+            raise Exit(1)
+
         # TODO: cargo build with project name and the correct platform
+        if not build_cargo_project(toolchain_name, project_data.name):
+            raise Exit(1)
+
         # TODO: copy built binaries into dist folder in correct formatting and naming
+        cargo_release_path = Path(f"./target/{toolchain_name}/release")
+
+        if platform_format == PlatformFormat.LINUX:
+            binary_path = cargo_release_path.joinpath(project_data.name)
+
+            format_and_copy_binary_to_dist(
+                current_working_directory,
+                binary_path,
+                platform_format,
+                project_data
+            )
+
+        if platform_format == PlatformFormat.WINDOWS_BINARY:
+            binary_path = cargo_release_path.joinpath(f"{project_data.name}.exe")
+
+            format_and_copy_binary_to_dist(
+                current_working_directory,
+                binary_path,
+                platform_format,
+                project_data
+            )
+
         # TODO: package special types of formats correctly (e.g: windows-setup, generate configs for NSIS)
 
     print("WIP!")
+
+def format_and_copy_binary_to_dist(
+    cwd: Path,
+    binary_path: Path,
+    platform_format: PlatformFormat,
+    project_data: ProjectData
+):
+    dist_path = cwd.joinpath("dist")
+    dist_path.mkdir(exist_ok = True)
+
+    platform_format_to_bin_suffix_map = {
+        PlatformFormat.LINUX: "linux-x86_64",
+        PlatformFormat.MACOS: "macos-x86_64",
+        PlatformFormat.WINDOWS: "win-x86_64.exe",
+        PlatformFormat.WINDOWS_BINARY: "win-x86_64.exe",
+        PlatformFormat.WINDOWS_SETUP: "win-x86_64-setup.exe",
+    }
+
+    binary_suffix = platform_format_to_bin_suffix_map[platform_format]
+
+    binary_dist_path = dist_path.joinpath(f"{project_data.name}-{binary_suffix}")
+
+    logger.debug(
+        f"Copying built binary into dist folder formatted as '{binary_dist_path.name}'..."
+    )
+    shutil.copy(binary_path, binary_dist_path)
