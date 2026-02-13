@@ -15,7 +15,7 @@ __all__ = (
 
 logger = logging.getLogger(__name__)
 
-def get_cargo_project_data(project_root_dir: Path, cargo_package_name: str) -> Optional[ProjectData]:
+def get_cargo_project_data(cargo_crate_name: str) -> Optional[ProjectData]:
     args = ["cargo", "metadata", "--no-deps", "--format-version", "1"]
 
     logger.debug("Running cargo metadata command to retrieve cargo project information...")
@@ -34,11 +34,11 @@ def get_cargo_project_data(project_root_dir: Path, cargo_package_name: str) -> O
 
     for cargo_package in cargo_metadata_data["packages"]:
 
-        if cargo_package.name == cargo_package_name:
+        if cargo_package.name == cargo_crate_name:
             return ProjectData(
                 name = cargo_package.name
             )
 
-    logger.error(f"Cargo package was not found with the name '{cargo_package_name}'!")
+    logger.error(f"Cargo package was not found with the name '{cargo_crate_name}'!")
 
     return None

@@ -1,0 +1,6 @@
+version = 1
+
+# Using Roseate (https://github.com/cloudy-org/roseate) as an example.
+
+[project.cargo]
+bin-crate = "roseate" # The name of the cargo binary crate to target
