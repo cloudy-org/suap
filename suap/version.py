@@ -2,7 +2,7 @@ from typer import Exit
 
 __all__ = ()
 
-__version__ = "1.0.0"
+__version__ = "0.1.0"
 
 def version_callback(value: bool):
     if not value:

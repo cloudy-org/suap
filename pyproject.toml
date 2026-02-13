@@ -1,20 +1,19 @@
 [project]
 name = "suap"
-version = "0.1.0"
 description = "A tool to help us with cross-platform deployment."
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "typer>=0.21.0",
 ]
+dynamic = ["version"]
 
 [project.scripts]
 suap = "suap.main:app"
 
 [build-system]
-requires = ["uv_build>=0.10.2,<0.11.0"]
-build-backend = "uv_build"
+requires = ["setuptools >= 77.0.3"]
+build-backend = "setuptools.build_meta"
 
-[tool.uv.build-backend]
-module-name = "suap"
-module-root = ""
+[tool.setuptools.dynamic]
+version = { attr = "suap.version.__version__" }
