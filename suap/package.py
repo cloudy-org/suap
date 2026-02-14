@@ -33,8 +33,8 @@ def package(
     bin_output_name: Annotated[
         Optional[str],
         Option(
-            help = "Override the default project name prefixed in front of the binary name " \
-                "(e.g: 'name-linux-x86_64', 'name-win-x86_64-setup.exe', 'name-macos-x86_64')."
+            help = "Override the default binary name prefixed in front of the binary suffix " \
+                "(e.g: 'bin-name-linux-x86_64', 'bib-name-win-x86_64-setup.exe', 'bin-name-macos-x86_64')."
         )
     ] = None,
 ):
@@ -85,13 +85,15 @@ def package(
         # TODO: copy built binaries into dist folder in correct formatting and naming
         cargo_release_path = Path(f"./target/{toolchain_name}/release")
 
+        binary_name = bin_output_name if bin_output_name is not None else project_data.name
+
         if platform_format & PlatformFormat.LINUX_BIN:
             binary_path = cargo_release_path.joinpath(project_data.name)
 
             format_and_copy_binary_to_dist(
                 current_working_directory,
                 binary_path,
-                binary_name = project_data.name,
+                binary_name = binary_name,
                 binary_suffix = "linux-x86_64",
             )
 
@@ -101,7 +103,7 @@ def package(
             format_and_copy_binary_to_dist(
                 current_working_directory,
                 binary_path,
-                binary_name = project_data.name,
+                binary_name = binary_name,
                 binary_suffix = "win-x86_64.exe",
             )
 
