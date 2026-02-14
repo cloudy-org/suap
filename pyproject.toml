@@ -4,12 +4,18 @@ description = "A tool to help us with cross-platform deployment."
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "typer>=0.21.0",
+    "typer>=0.23.1",
 ]
 dynamic = ["version"]
 
 [project.scripts]
 suap = "suap.main:app"
+
+[dependency-groups]
+dev = [
+    "ty>=0.0.17",
+    "ruff>=0.15.1"
+]
 
 [build-system]
 requires = ["setuptools >= 77.0.3"]
