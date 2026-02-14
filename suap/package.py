@@ -85,15 +85,6 @@ def package(
         # TODO: copy built binaries into dist folder in correct formatting and naming
         cargo_release_path = Path(f"./target/{toolchain_name}/release")
 
-        print(
-            "-->",
-            platform_format,
-            PlatformFormat.LINUX,
-            platform_format & PlatformFormat.LINUX_BIN,
-            PlatformFormat.WINDOWS,
-            platform_format & PlatformFormat.WINDOWS_BIN
-        )
-
         if platform_format & PlatformFormat.LINUX_BIN:
             binary_path = cargo_release_path.joinpath(project_data.name)
 
