@@ -1,19 +1,18 @@
 from typing import Annotated, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from config.data import ConfigProjectData
+    from .config.data import ConfigProjectData
 
 import os
 import shutil
 import logging
 from pathlib import Path
-from subprocess import Popen
 from typer import Option, Typer, Exit
 
 from .config import get_config_data
 from .project_type import ProjectType
-from .platform_format import PlatformFormat
-from .projects import ProjectData, find_and_get_cargo_project_data, build_cargo_project, get_cargo_toolchain
+from .platform_format import PlatformFormat, PlatformFormatOption
+from .projects import find_and_get_cargo_project_data, build_cargo_project, get_cargo_toolchain
 
 __all__ = ()
 
@@ -24,7 +23,7 @@ logger = logging.getLogger(__name__)
 def package(
     project: Annotated[ProjectType, Option(help = "Which project should we package (e.g: the cargo project, python project?).")],
     platform_format: Annotated[
-        PlatformFormat,
+        PlatformFormatOption,
         Option(
             help = "The packaging format or platform we are targeting. Choose a less generic option if you only want to " \
                 "package towards ONE specific format such as 'windows-setup', otherwise all available formats " \
@@ -39,6 +38,8 @@ def package(
         )
     ] = None,
 ):
+    platform_format: PlatformFormat = platform_format.get_platform_format()
+
     current_working_directory = Path(os.getcwd())
 
     logger.debug("Getting config data...")
@@ -84,50 +85,62 @@ def package(
         # TODO: copy built binaries into dist folder in correct formatting and naming
         cargo_release_path = Path(f"./target/{toolchain_name}/release")
 
-        if platform_format == PlatformFormat.LINUX:
+        print(
+            "-->",
+            platform_format,
+            PlatformFormat.LINUX,
+            platform_format & PlatformFormat.LINUX_BIN,
+            PlatformFormat.WINDOWS,
+            platform_format & PlatformFormat.WINDOWS_BIN
+        )
+
+        if platform_format & PlatformFormat.LINUX_BIN:
             binary_path = cargo_release_path.joinpath(project_data.name)
 
             format_and_copy_binary_to_dist(
                 current_working_directory,
                 binary_path,
-                platform_format,
-                project_data
+                binary_name = project_data.name,
+                binary_suffix = "linux-x86_64",
             )
 
-        if platform_format == PlatformFormat.WINDOWS_BINARY:
+        if platform_format & PlatformFormat.WINDOWS_BIN:
             binary_path = cargo_release_path.joinpath(f"{project_data.name}.exe")
 
             format_and_copy_binary_to_dist(
                 current_working_directory,
                 binary_path,
-                platform_format,
-                project_data
+                binary_name = project_data.name,
+                binary_suffix = "win-x86_64.exe",
             )
 
         # TODO: package special types of formats correctly (e.g: windows-setup, generate configs for NSIS)
+        if platform_format & PlatformFormat.WINDOWS_SETUP:
+            ...
+
+            # format_and_copy_binary_to_dist(
+            #     current_working_directory,
+            #     binary_path,
+            #     binary_name = project_data.name,
+            #     binary_suffix = "win-x86_64-setup.exe",
+            # )
 
     print("WIP!")
 
 def format_and_copy_binary_to_dist(
     cwd: Path,
     binary_path: Path,
-    platform_format: PlatformFormat,
-    project_data: ProjectData
+    binary_name: str,
+    binary_suffix: str,
 ):
+    logger.debug(
+        f"Formatting binary with name '{binary_name}' and suffix '{binary_suffix}'..."
+    )
+
     dist_path = cwd.joinpath("dist")
     dist_path.mkdir(exist_ok = True)
 
-    platform_format_to_bin_suffix_map = {
-        PlatformFormat.LINUX: "linux-x86_64",
-        PlatformFormat.MACOS: "macos-x86_64",
-        PlatformFormat.WINDOWS: "win-x86_64.exe",
-        PlatformFormat.WINDOWS_BINARY: "win-x86_64.exe",
-        PlatformFormat.WINDOWS_SETUP: "win-x86_64-setup.exe",
-    }
-
-    binary_suffix = platform_format_to_bin_suffix_map[platform_format]
-
-    binary_dist_path = dist_path.joinpath(f"{project_data.name}-{binary_suffix}")
+    binary_dist_path = dist_path.joinpath(f"{binary_name}-{binary_suffix}")
 
     logger.debug(
         f"Copying built binary into dist folder formatted as '{binary_dist_path.name}'..."
