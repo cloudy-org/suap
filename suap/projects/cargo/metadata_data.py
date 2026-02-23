@@ -9,6 +9,7 @@ __all__ = (
 class CargoMetadataPackagesData(TypedDict):
     name: str
     version: str
+    description: str
 
 class CargoMetadataData(TypedDict):
     packages: list[CargoMetadataPackagesData]

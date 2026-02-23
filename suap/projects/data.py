@@ -1,3 +1,4 @@
+from semver import Version
 from dataclasses import dataclass
 
 __all__ = (
@@ -7,3 +8,5 @@ __all__ = (
 @dataclass
 class ProjectData:
     name: str
+    version: Version
+    description: str

@@ -1,0 +1,1 @@
+from .nsis_installer import *

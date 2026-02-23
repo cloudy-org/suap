@@ -6,7 +6,7 @@ from typer import Option, Typer
 from .logger import LogFormatter
 
 from .version import version_callback
-from .package import app as package_app
+from .packaging import app as package_app
 
 app = Typer(
     pretty_exceptions_show_locals = False

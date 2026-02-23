@@ -1,7 +1,7 @@
 from typing import Annotated, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .config.data import ConfigProjectData
+    from ..config.data import ConfigProjectData
 
 import os
 import shutil
@@ -9,12 +9,14 @@ import logging
 from pathlib import Path
 from typer import Option, Typer, Exit
 
-from .config import get_config_data
-from .project_type import ProjectType
-from .platform_format import PlatformFormat, PlatformFormatOption
-from .projects import find_and_get_cargo_project_data, build_cargo_project, get_cargo_toolchain
+from .nsis import format_config_and_make_nsis_installer
 
-__all__ = ()
+from ..config import get_config_data
+from ..project_type import ProjectType
+from ..platform_format import PlatformFormat, PlatformFormatOption
+from ..projects import find_and_get_cargo_project_data, build_cargo_project, get_cargo_toolchain
+
+__all__ = ("app",)
 
 app = Typer()
 logger = logging.getLogger(__name__)
@@ -41,6 +43,9 @@ def package(
     platform_format: PlatformFormat = platform_format.get_platform_format()
 
     current_working_directory = Path(os.getcwd())
+
+    dist_folder_path = current_working_directory.joinpath("dist")
+    temp_folder_path = current_working_directory.joinpath("temp")
 
     logger.debug("Getting config data...")
     config_data = get_config_data(current_working_directory)
@@ -91,49 +96,50 @@ def package(
             binary_path = cargo_release_path.joinpath(project_data.name)
 
             format_and_copy_binary_to_dist(
-                current_working_directory,
                 binary_path,
                 binary_name = binary_name,
                 binary_suffix = "linux-x86_64",
+                dist_folder_path = dist_folder_path,
             )
 
         if platform_format & PlatformFormat.WINDOWS_BIN:
             binary_path = cargo_release_path.joinpath(f"{project_data.name}.exe")
 
             format_and_copy_binary_to_dist(
-                current_working_directory,
                 binary_path,
                 binary_name = binary_name,
                 binary_suffix = "win-x86_64.exe",
+                dist_folder_path = dist_folder_path,
             )
 
         # TODO: package special types of formats correctly (e.g: windows-setup, generate configs for NSIS)
         if platform_format & PlatformFormat.WINDOWS_SETUP:
-            ...
+            binary_path = cargo_release_path.joinpath(f"{project_data.name}.exe")
 
-            # format_and_copy_binary_to_dist(
-            #     current_working_directory,
-            #     binary_path,
-            #     binary_name = project_data.name,
-            #     binary_suffix = "win-x86_64-setup.exe",
-            # )
+            format_config_and_make_nsis_installer(
+                binary_path,
+                binary_name = binary_name,
+                binary_suffix = "win-x86_64-setup.exe",
+                dist_folder_path = dist_folder_path,
+                temp_folder_path = temp_folder_path,
+                project_data = project_data
+            )
 
     print("WIP!")
 
 def format_and_copy_binary_to_dist(
-    cwd: Path,
     binary_path: Path,
     binary_name: str,
     binary_suffix: str,
+    dist_folder_path: Path,
 ):
     logger.debug(
         f"Formatting binary with name '{binary_name}' and suffix '{binary_suffix}'..."
     )
 
-    dist_path = cwd.joinpath("dist")
-    dist_path.mkdir(exist_ok = True)
+    dist_folder_path.mkdir(exist_ok = True)
 
-    binary_dist_path = dist_path.joinpath(f"{binary_name}-{binary_suffix}")
+    binary_dist_path = dist_folder_path.joinpath(f"{binary_name}-{binary_suffix}")
 
     logger.debug(
         f"Copying built binary into dist folder formatted as '{binary_dist_path.name}'..."

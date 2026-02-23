@@ -2,6 +2,7 @@ from typing import Optional
 
 import json
 import logging
+from semver import Version
 from subprocess import check_output, CalledProcessError
 
 from ..data import ProjectData
@@ -32,10 +33,11 @@ def find_and_get_cargo_project_data(cargo_crate_name: str) -> Optional[ProjectDa
     cargo_metadata_data: CargoMetadataData = json.loads(json_string)
 
     for cargo_package in cargo_metadata_data["packages"]:
-
         if cargo_package["name"] == cargo_crate_name:
             return ProjectData(
-                name = cargo_package["name"]
+                name = cargo_package["name"],
+                description = cargo_package["description"],
+                version = Version.parse(cargo_package["version"]),
             )
 
     logger.error(f"Cargo package was not found with the name '{cargo_crate_name}'!")
