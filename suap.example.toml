@@ -1,6 +1,7 @@
 version = 1
 
 # Using Roseate (https://github.com/cloudy-org/roseate) as an example.
+display-name = "Roseate" # TODO: add support for display name
 
 [project.cargo]
 bin-crate = "roseate" # The name of the cargo binary crate to target
