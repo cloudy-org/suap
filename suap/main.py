@@ -4,9 +4,8 @@ import logging
 from typer import Option, Typer
 
 from .logger import LogFormatter
-from .version import version_callback
 
-from .commands import packaging
+from .commands import version, packaging
 
 app = Typer(
     pretty_exceptions_show_locals = False
@@ -22,8 +21,8 @@ def callback(
         Option(
             "--version",
             is_eager = True,
-            callback = version_callback,
-            help = "Shows suap version."
+            callback = version.version_callback,
+            help = "Show suap version."
         )
     ] = None,
 ):
