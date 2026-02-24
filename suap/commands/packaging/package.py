@@ -1,20 +1,20 @@
 from typing import Annotated, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ..config.data import ConfigProjectData
+    from ...config.data import ConfigProjectData
 
 import os
-import shutil
 import logging
 from pathlib import Path
 from typer import Option, Typer, Exit
 
+from .binary import format_and_copy_binary_to_dist
 from .nsis import format_config_and_make_nsis_installer
 
-from ..config import get_config_data
-from ..project_type import ProjectType
-from ..platform_format import PlatformFormat, PlatformFormatOption
-from ..projects import find_and_get_cargo_project_data, build_cargo_project, get_cargo_toolchain
+from ...config import get_config_data
+from ...project_type import ProjectType
+from ...platform_format import PlatformFormat, PlatformFormatOption
+from ...projects import find_and_get_cargo_project_data, build_cargo_project, get_cargo_toolchain
 
 __all__ = ("app",)
 
@@ -126,22 +126,3 @@ def package(
             )
 
     print("WIP!")
-
-def format_and_copy_binary_to_dist(
-    binary_path: Path,
-    binary_name: str,
-    binary_suffix: str,
-    dist_folder_path: Path,
-):
-    logger.debug(
-        f"Formatting binary with name '{binary_name}' and suffix '{binary_suffix}'..."
-    )
-
-    dist_folder_path.mkdir(exist_ok = True)
-
-    binary_dist_path = dist_folder_path.joinpath(f"{binary_name}-{binary_suffix}")
-
-    logger.debug(
-        f"Copying built binary into dist folder formatted as '{binary_dist_path.name}'..."
-    )
-    shutil.copy(binary_path, binary_dist_path)

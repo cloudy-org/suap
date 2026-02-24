@@ -3,8 +3,11 @@ import logging
 from typer import Exit
 from pathlib import Path
 
-from ..projects import ProjectData
-from ..formats import make_nsis_installer
+# just so we can get the root path of our library
+import suap
+
+from ...projects import ProjectData
+from ...formats import make_nsis_installer
 
 __all__ = (
     "format_config_and_make_nsis_installer",
@@ -30,7 +33,7 @@ def format_config_and_make_nsis_installer(
     temp_folder_path.mkdir(exist_ok = True)
     nsis_installer_script_path = temp_folder_path.joinpath("nsis_installer.nsi")
 
-    installer_script_template_path = Path(__file__).parent.parent.joinpath(
+    installer_script_template_path = Path(suap.__file__).parent.joinpath(
         "templates", "nsis_installer_script.nsi"
     )
 

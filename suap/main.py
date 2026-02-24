@@ -4,14 +4,14 @@ import logging
 from typer import Option, Typer
 
 from .logger import LogFormatter
-
 from .version import version_callback
-from .packaging import app as package_app
+
+from .commands import packaging
 
 app = Typer(
     pretty_exceptions_show_locals = False
 )
-app.add_typer(package_app)
+app.add_typer(packaging.app)
 
 logger = logging.getLogger(__name__)
 
