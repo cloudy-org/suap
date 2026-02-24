@@ -83,11 +83,9 @@ def package(
             )
             raise Exit(1)
 
-        # TODO: cargo build with project name and the correct platform
         if not build_cargo_project(toolchain_name, project_data.name):
             raise Exit(1)
 
-        # TODO: copy built binaries into dist folder in correct formatting and naming
         cargo_release_path = Path(f"./target/{toolchain_name}/release")
 
         binary_name = bin_output_name if bin_output_name is not None else project_data.name
@@ -112,7 +110,6 @@ def package(
                 dist_folder_path = dist_folder_path,
             )
 
-        # TODO: package special types of formats correctly (e.g: windows-setup, generate configs for NSIS)
         if platform_format & PlatformFormat.WINDOWS_SETUP:
             binary_path = cargo_release_path.joinpath(f"{project_data.name}.exe")
 
@@ -125,4 +122,4 @@ def package(
                 project_data = project_data
             )
 
-    print("WIP!")
+    logger.info("WIP!")
