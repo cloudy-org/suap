@@ -14,8 +14,8 @@ suap = "suap.main:app"
 
 [dependency-groups]
 dev = [
-    "ty>=0.0.17",
-    "ruff>=0.15.1"
+    "ty>=0.0.21",
+    "ruff>=0.15.5"
 ]
 
 [build-system]
@@ -23,7 +23,7 @@ requires = ["setuptools >= 77.0.3"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.dynamic]
-version = { attr = "suap.version.__version__" }
+version = { attr = "suap.__version__" }
 
 [tool.setuptools.package-data]
 suap = ["templates/*"]

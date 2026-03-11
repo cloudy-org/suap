@@ -21,6 +21,7 @@ def format_config_and_make_nsis_installer(
     binary_suffix: str,
     dist_folder_path: Path,
     temp_folder_path: Path,
+    display_name: str,
     project_data: ProjectData,
 ):
     logger.debug(
@@ -52,6 +53,7 @@ def format_config_and_make_nsis_installer(
         "suap-binary-name": binary_name,
         "suap-binary-path": f"../{binary_path}",
         "suap-binary-dist-path": str(binary_dist_path),
+        "suap-display-name": display_name,
 
         "suap-project-name": project_data.name,
         "suap-project-version": f"{semver.major}.{semver.minor}.{semver.patch}" \

@@ -53,6 +53,8 @@ def package(
     if config_data is None:
         raise Exit(1)
 
+    display_name: Optional[str] = config_data.get("display-name", None)
+
     if project == ProjectType.CARGO:
         projects_data: Optional[ConfigProjectData] = config_data.get("project", None)
 
@@ -119,6 +121,7 @@ def package(
                 binary_suffix = "win-x86_64-setup.exe",
                 dist_folder_path = dist_folder_path,
                 temp_folder_path = temp_folder_path,
+                display_name = display_name if display_name is not None else project_data.name,
                 project_data = project_data
             )
 

@@ -14,6 +14,11 @@ ConfigCargoProjectData = TypedDict(
 class ConfigProjectData(TypedDict):
     cargo: ConfigCargoProjectData
 
-class ConfigData(TypedDict):
-    version: int
-    project: ConfigProjectData
+ConfigData = TypedDict(
+    "ConfigData",
+    {
+        "version": int,
+        "display-name": str,
+        "project": ConfigProjectData
+    }
+)

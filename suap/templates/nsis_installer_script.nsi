@@ -1,15 +1,11 @@
 !include "MUI2.nsh"
 
-# TODO: All "suap-project-name" keys except "InstallDir" and 
-# "CreateShortcut" need to be changed to "suap-display-name" 
-# when that is available.
-
-Name "{suap-project-name}"
+Name "{suap-display-name}"
 OutFile "{suap-binary-dist-path}"
 InstallDir "$PROGRAMFILES64\cloudy-org\{suap-project-name}"
 
 VIProductVersion "{suap-project-version}"
-VIAddVersionKey "ProductName" "{suap-project-name}"
+VIAddVersionKey "ProductName" "{suap-display-name}"
 VIAddVersionKey "FileDescription" "{suap-project-description}"
 VIAddVersionKey "FileVersion" "{suap-project-version}"
 
@@ -33,7 +29,7 @@ Section "MainSection"
     WriteUninstaller "$INSTDIR\uninstall.exe"
 
     # Windows needs to know our application can be uninstalled via it's uninstall apps settings.
-    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\{suap-project-name}" "DisplayName" "{suap-project-name}"
+    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\{suap-project-name}" "DisplayName" "{suap-display-name}"
     WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\{suap-project-name}" "UninstallString" "$INSTDIR\uninstall.exe"
 
     CreateShortcut "$DESKTOP\{suap-project-name}.lnk" "$INSTDIR\{suap-binary-name}.exe"
@@ -44,6 +40,8 @@ Section "Uninstall"
     Delete "$INSTDIR\{suap-binary-name}.exe"
     Delete "$INSTDIR\uninstall.exe"
     RMDir "$INSTDIR"
+
+    Delete "$DESKTOP\{suap-project-name}.lnk"
 
     DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\{suap-project-name}"
 SectionEnd

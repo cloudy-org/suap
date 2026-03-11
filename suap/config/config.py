@@ -28,6 +28,6 @@ def get_config_data(project_root_dir: Path) -> Optional[ConfigData]:
 
     with open(config_path, mode = "rb") as file:
         logger.debug("Parsing toml config...")
-        config_data = tomllib.load(file) # ty: ignore[invalid-assignment]
+        config_data = tomllib.load(file)
 
     return config_data
