@@ -1,7 +1,16 @@
 version = 1
-
 # Using Roseate (https://github.com/cloudy-org/roseate) as an example.
-display-name = "Roseate" # TODO: add support for display name
+
+# If display name is not specified the 
+# strict lower-case app name will be used instead
+display-name = "Roseate"
+
+# The icons folder is where you'll place your icons.
+# 
+# The name of the image files must be specific like so:
+# "windows.ico" - windows specific app icon
+# "original.png" - when there's no platform specific icon suap falls back to
+icons = "./assets/icons"
 
 [project.cargo]
 bin-crate = "roseate" # The name of the cargo binary crate to target

@@ -1,6 +1,7 @@
 !include "MUI2.nsh"
 
 Name "{suap-display-name}"
+BrandingText "{suap-display-name}"
 OutFile "{suap-binary-dist-path}"
 InstallDir "$PROGRAMFILES64\cloudy-org\{suap-project-name}"
 
@@ -10,6 +11,13 @@ VIAddVersionKey "FileDescription" "{suap-project-description}"
 VIAddVersionKey "FileVersion" "{suap-project-version}"
 
 SetCompressor /SOLID Lzma
+
+# Defining some MUI specific features, like icons for the installer executables
+!define MUI_ICON "{suap-icon-path}"
+!define MUI_UNICON "{suap-icon-path}"
+
+!define MUI_ABORTWARNING # good UX
+!define MUI_UNABORTWARNING
 
 # The typical installer pages a windows user will expect before installing software.
 !insertmacro MUI_PAGE_WELCOME
@@ -24,7 +32,10 @@ SetCompressor /SOLID Lzma
 Section "MainSection"
     # Where we place our application binary file and other files.
     SetOutPath "$INSTDIR"
+
+    # Where we add files from our environment, such as the application binary to the windows install directory.
     File "{suap-binary-path}"
+    File "{suap-icon-path}"
 
     WriteUninstaller "$INSTDIR\uninstall.exe"
 
@@ -32,12 +43,13 @@ Section "MainSection"
     WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\{suap-project-name}" "DisplayName" "{suap-display-name}"
     WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\{suap-project-name}" "UninstallString" "$INSTDIR\uninstall.exe"
 
-    CreateShortcut "$DESKTOP\{suap-project-name}.lnk" "$INSTDIR\{suap-binary-name}.exe"
+    CreateShortcut "$DESKTOP\{suap-project-name}.lnk" "$INSTDIR\{suap-binary-name}.exe" "" "$INSTDIR\{suap-icon-file-name}" 0
 SectionEnd
 
 Section "Uninstall"
     # Where we remove our application binary file and other files.
     Delete "$INSTDIR\{suap-binary-name}.exe"
+    Delete "$INSTDIR\{suap-icon-file-name}"
     Delete "$INSTDIR\uninstall.exe"
     RMDir "$INSTDIR"
 

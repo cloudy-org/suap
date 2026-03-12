@@ -1,4 +1,5 @@
-import shutil
+from typing import Optional
+
 import logging
 from typer import Exit
 from pathlib import Path
@@ -21,7 +22,8 @@ def format_config_and_make_nsis_installer(
     binary_suffix: str,
     dist_folder_path: Path,
     temp_folder_path: Path,
-    display_name: str,
+    display_name: Optional[str],
+    icon_path: Path,
     project_data: ProjectData,
 ):
     logger.debug(
@@ -51,9 +53,11 @@ def format_config_and_make_nsis_installer(
 
     replace_map: dict[str, str] = {
         "suap-binary-name": binary_name,
-        "suap-binary-path": f"../{binary_path}",
-        "suap-binary-dist-path": str(binary_dist_path),
-        "suap-display-name": display_name,
+        "suap-binary-path": str(binary_path.absolute()),
+        "suap-binary-dist-path": str(binary_dist_path.absolute()),
+        "suap-display-name": display_name if display_name is not None else project_data.name,
+        "suap-icon-path": str(icon_path.absolute()),
+        "suap-icon-file-name": icon_path.name,
 
         "suap-project-name": project_data.name,
         "suap-project-version": f"{semver.major}.{semver.minor}.{semver.patch}" \
@@ -74,8 +78,4 @@ def format_config_and_make_nsis_installer(
     if not make_nsis_installer(nsis_installer_script_path):
         raise Exit(1)
 
-    logger.debug("Done making NSIS installer, installer executable should be in dist.")
-
-    logger.debug("Removing temp dir...")
-
-    shutil.rmtree(temp_folder_path)
+    logger.info("Done making NSIS installer, installer executable should be in dist.")

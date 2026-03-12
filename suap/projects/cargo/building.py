@@ -1,5 +1,6 @@
 from typing import Optional
 
+import os
 import logging
 from subprocess import check_call, CalledProcessError
 
@@ -30,6 +31,9 @@ def build_cargo_project(toolchain_name: str, cargo_crate_name: str) -> bool:
     logger.debug(f"Invoking 'cargo build' with toolchain '{toolchain_name}'...")
 
     try:
+        default_env = os.environ.copy()
+        default_env["RUSTFLAGS"] = "-Awarnings" # hides warnings in console
+
         check_call(
             [
                 "cargo",
@@ -39,7 +43,8 @@ def build_cargo_project(toolchain_name: str, cargo_crate_name: str) -> bool:
                 cargo_crate_name,
                 "--target",
                 toolchain_name
-            ]
+            ],
+            env = default_env
         )
 
     except CalledProcessError as error:

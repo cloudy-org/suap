@@ -19,6 +19,7 @@ ConfigData = TypedDict(
     {
         "version": int,
         "display-name": str,
+        "icons": str,
         "project": ConfigProjectData
     }
 )

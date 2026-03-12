@@ -4,12 +4,14 @@ if TYPE_CHECKING:
     from ...config.data import ConfigProjectData
 
 import os
+import shutil
 import logging
 from pathlib import Path
 from typer import Option, Typer, Exit
 
 from .binary import format_and_copy_binary_to_dist
 from .nsis import format_config_and_make_nsis_installer
+from .icons import get_platform_icon_path, format_icon_with_project_name
 
 from ...config import get_config_data
 from ...project_type import ProjectType
@@ -29,14 +31,14 @@ def package(
         Option(
             help = "The packaging format or platform we are targeting. Choose a less generic option if you only want to " \
                 "package towards ONE specific format such as 'windows-setup', otherwise all available formats " \
-                "of such platform will be automatically packaged."
+                "of such platform will be automatically packaged (as is the case with 'windows')."
         )
     ],
     bin_output_name: Annotated[
         Optional[str],
         Option(
             help = "Override the default binary name prefixed in front of the binary suffix " \
-                "(e.g: 'bin-name-linux-x86_64', 'bib-name-win-x86_64-setup.exe', 'bin-name-macos-x86_64')."
+                "(e.g: 'bin-name-linux-x86_64', 'bin-name-win-x86_64-setup.exe', 'bin-name-macos-x86_64')."
         )
     ] = None,
 ):
@@ -54,6 +56,31 @@ def package(
         raise Exit(1)
 
     display_name: Optional[str] = config_data.get("display-name", None)
+    icons_config_path: Optional[str] = config_data.get("icons", None)
+
+    if icons_config_path is None:
+        logger.error(
+            "Icons folder is required to be specific in the config and at " \
+                "least an original icon must be present (e.g: 'original.png')!" \
+                    '\n    icons = "./assets/icons"'
+        )
+        raise Exit(1)
+
+    icons_path = Path(icons_config_path)
+
+    if not icons_path.exists():
+        logger.error(f"Icons folder path does not exist ('{icons_path}')!")
+
+        raise Exit(1)
+
+    platform_icon_path = get_platform_icon_path(icons_path, platform_format)
+
+    if platform_icon_path is None:
+        logger.error(
+            "At least an original icon is required in your icons " \
+                f"path at '{icons_config_path}' (e.g: 'original.png')!"
+        )
+        raise Exit(1)
 
     if project == ProjectType.CARGO:
         projects_data: Optional[ConfigProjectData] = config_data.get("project", None)
@@ -115,14 +142,24 @@ def package(
         if platform_format & PlatformFormat.WINDOWS_SETUP:
             binary_path = cargo_release_path.joinpath(f"{project_data.name}.exe")
 
+            platform_icon_path = format_icon_with_project_name(
+                platform_icon_path,
+                temp_folder_path,
+                project_name = project_data.name
+            )
+
             format_config_and_make_nsis_installer(
                 binary_path,
                 binary_name = binary_name,
                 binary_suffix = "win-x86_64-setup.exe",
                 dist_folder_path = dist_folder_path,
                 temp_folder_path = temp_folder_path,
-                display_name = display_name if display_name is not None else project_data.name,
+                display_name = display_name,
+                icon_path = platform_icon_path,
                 project_data = project_data
             )
 
-    logger.info("WIP!")
+    logger.debug("Removing temp dir...")
+    shutil.rmtree(temp_folder_path, ignore_errors = True)
+
+    logger.info("This command is WIP!")
