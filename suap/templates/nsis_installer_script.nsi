@@ -9,6 +9,8 @@ VIProductVersion "{suap-project-version}"
 VIAddVersionKey "ProductName" "{suap-display-name}"
 VIAddVersionKey "FileDescription" "{suap-project-description}"
 VIAddVersionKey "FileVersion" "{suap-project-version}"
+VIAddVersionKey "CompanyName" "Cloudy Org"
+VIAddVersionKey "LegalCopyright" "© 2026 Goldy"
 
 SetCompressor /SOLID Lzma
 
@@ -39,15 +41,17 @@ Section "MainSection"
     File "{suap-binary-path}"
     File "{suap-icon-path}"
 
-    WriteUninstaller "$INSTDIR\uninstall.exe"
-
-    # Windows needs to know our application can be uninstalled via it's uninstall apps settings.
-    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\{suap-project-name}" "DisplayName" "{suap-display-name}"
-    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\{suap-project-name}" "UninstallString" "$INSTDIR\uninstall.exe"
-
     # Placing shortcut in "C:\ProgramData\Microsoft\Windows\Start Menu\Programs"
     CreateDirectory "$SMPROGRAMS\Cloudy"
     CreateShortcut "$SMPROGRAMS\Cloudy\{suap-project-name}.lnk" "$INSTDIR\{suap-binary-name}.exe" "" "$INSTDIR\{suap-icon-file-name}" 0
+
+    WriteUninstaller "$INSTDIR\uninstall.exe"
+
+    # Windows needs to know our application can be uninstalled via it's uninstall apps settings.
+    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\{suap-project-name}" "Publisher" "Cloudy Org"
+    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\{suap-project-name}" "DisplayName" "{suap-display-name}"
+    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\{suap-project-name}" "DisplayVersion" "{suap-project-version}"
+    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\{suap-project-name}" "UninstallString" "$INSTDIR\uninstall.exe"
 SectionEnd
 
 Section "Uninstall"
