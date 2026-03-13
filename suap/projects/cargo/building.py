@@ -34,6 +34,10 @@ def build_cargo_project(toolchain_name: str, cargo_crate_name: str) -> bool:
         default_env = os.environ.copy()
         default_env["RUSTFLAGS"] = "-Awarnings" # hides warnings in console
 
+        logger.warning(
+            f"RUSTFLAGS are not inherited! 'RUSTFLAGS' will contain -> '{default_env["RUSTFLAGS"]}'."
+        )
+
         check_call(
             [
                 "cargo",
