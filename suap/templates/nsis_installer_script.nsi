@@ -3,7 +3,7 @@
 Name "{suap-display-name}"
 BrandingText "{suap-display-name}"
 OutFile "{suap-binary-dist-path}"
-InstallDir "$PROGRAMFILES64\cloudy-org\{suap-project-name}"
+InstallDir "$PROGRAMFILES64\Cloudy\{suap-project-name}"
 
 VIProductVersion "{suap-project-version}"
 VIAddVersionKey "ProductName" "{suap-display-name}"
