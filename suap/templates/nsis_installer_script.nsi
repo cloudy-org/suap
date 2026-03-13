@@ -30,6 +30,8 @@ SetCompressor /SOLID Lzma
 # installer, it's where the installation 
 # of the application and uninstaller happens.
 Section "MainSection"
+    SetShellVarContext all
+
     # Where we place our application binary file and other files.
     SetOutPath "$INSTDIR"
 
@@ -43,17 +45,21 @@ Section "MainSection"
     WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\{suap-project-name}" "DisplayName" "{suap-display-name}"
     WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\{suap-project-name}" "UninstallString" "$INSTDIR\uninstall.exe"
 
-    CreateShortcut "$DESKTOP\{suap-project-name}.lnk" "$INSTDIR\{suap-binary-name}.exe" "" "$INSTDIR\{suap-icon-file-name}" 0
+    # Placing shortcut in "C:\ProgramData\Microsoft\Windows\Start Menu\Programs"
+    CreateDirectory "$SMPROGRAMS\Cloudy"
+    CreateShortcut "$SMPROGRAMS\Cloudy\{suap-project-name}.lnk" "$INSTDIR\{suap-binary-name}.exe" "" "$INSTDIR\{suap-icon-file-name}" 0
 SectionEnd
 
 Section "Uninstall"
+    SetShellVarContext all
+
     # Where we remove our application binary file and other files.
     Delete "$INSTDIR\{suap-binary-name}.exe"
     Delete "$INSTDIR\{suap-icon-file-name}"
     Delete "$INSTDIR\uninstall.exe"
     RMDir "$INSTDIR"
 
-    Delete "$DESKTOP\{suap-project-name}.lnk"
+    Delete "$SMPROGRAMS\Cloudy\{suap-project-name}.lnk"
 
     DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\{suap-project-name}"
 SectionEnd
