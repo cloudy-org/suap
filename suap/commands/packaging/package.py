@@ -13,6 +13,7 @@ from .binary import format_and_copy_binary_to_dist
 from .nsis import format_config_and_make_nsis_installer
 from .icons import get_platform_icon_path, format_icon_with_project_name
 
+from ...mime_type import MimeType
 from ...config import get_config_data
 from ...project_type import ProjectType
 from ...platform_format import PlatformFormat, PlatformFormatOption
@@ -41,6 +42,7 @@ def package(
                 "(e.g: 'bin-name-linux-x86_64', 'bin-name-win-x86_64-setup.exe', 'bin-name-macos-x86_64')."
         )
     ] = None,
+    remove_temp: bool = True,
 ):
     platform_format: PlatformFormat = platform_format.get_platform_format()
 
@@ -55,8 +57,12 @@ def package(
     if config_data is None:
         raise Exit(1)
 
+    # TODO: move this stuff to some sort of Config class
     display_name: Optional[str] = config_data.get("display-name", None)
     icons_config_path: Optional[str] = config_data.get("icons", None)
+    mime_types: list[MimeType] = [
+        MimeType(mime_type_string = mime_type) for mime_type in config_data.get("mime_types", [])
+    ]
 
     if icons_config_path is None:
         logger.error(
@@ -156,10 +162,12 @@ def package(
                 temp_folder_path = temp_folder_path,
                 display_name = display_name,
                 icon_path = platform_icon_path,
-                project_data = project_data
+                mime_types = mime_types,
+                project_data = project_data,
             )
 
-    logger.debug("Removing temp dir...")
-    shutil.rmtree(temp_folder_path, ignore_errors = True)
+    if remove_temp:
+        logger.debug("Removing temp dir...")
+        shutil.rmtree(temp_folder_path, ignore_errors = True)
 
     logger.info("This command is WIP!")

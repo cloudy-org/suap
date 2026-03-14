@@ -20,6 +20,7 @@ ConfigData = TypedDict(
         "version": int,
         "display-name": str,
         "icons": str,
+        "mime_types": list[str],
         "project": ConfigProjectData
     }
 )

@@ -12,5 +12,12 @@ display-name = "Roseate"
 # "original.png" - when there's no platform specific icon suap falls back to
 icons = "./assets/icons"
 
+mime_types = [
+    "image/jpeg",
+    "image/gif",
+    "image/png",
+    "image/webp",
+]
+
 [project.cargo]
 bin-crate = "roseate" # The name of the cargo binary crate to target
