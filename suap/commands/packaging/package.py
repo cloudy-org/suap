@@ -9,6 +9,7 @@ import logging
 from pathlib import Path
 from typer import Option, Typer, Exit
 
+from .checks import check_project_data_validity
 from .binary import format_and_copy_binary_to_dist
 from .nsis import format_config_and_make_nsis_installer
 from .icons import get_platform_icon_path, format_icon_with_project_name
@@ -89,12 +90,12 @@ def package(
         raise Exit(1)
 
     if project == ProjectType.CARGO:
-        projects_data: Optional[ConfigProjectData] = config_data.get("project", None)
+        projects_config_data: Optional[ConfigProjectData] = config_data.get("project", None)
 
         cargo_crate_name: Optional[str] = None
 
-        if projects_data is not None:
-            cargo_config_data = projects_data.get("cargo", None)
+        if projects_config_data is not None:
+            cargo_config_data = projects_config_data.get("cargo", None)
 
             if cargo_config_data is not None:
                 cargo_crate_name = cargo_config_data.get("bin-crate", None)
@@ -108,6 +109,8 @@ def package(
 
         if project_data is None:
             raise Exit(1)
+
+        check_project_data_validity(project_data)
 
         toolchain_name = get_cargo_toolchain(platform_format)
 
