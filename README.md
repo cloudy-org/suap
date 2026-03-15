@@ -9,6 +9,8 @@
 > [!WARNING]
 > **USER NOTICE:** DO NOT use suap as a tool for building or installing cloudy-org applications, that is not the intent of the tool. 
 > For application setup / installation check the application's own instructions in it's `README.md` file.
+> 
+> Suap is in alpha testing stage at the moment, feel free to submit PRs to improve my shit Python code in this project. Thanks
 
 ### Prerequisites:
 - **[NSIS](https://nsis.sourceforge.io/Main_Page)** (for packaging windows installers)
