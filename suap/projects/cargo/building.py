@@ -23,6 +23,7 @@ def get_cargo_toolchain(platform_format: PlatformFormat) -> Optional[str]:
         toolchain_name = "x86_64-pc-windows-gnu"
 
     elif platform_format & PlatformFormat.MACOS:
+        # TODO: add and test macos support
         return None
 
     return toolchain_name

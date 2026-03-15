@@ -1,0 +1,21 @@
+# suap.toml
+
+version = 1
+
+# If display name is not specified the strict 
+# lower-case project app name will be used instead.
+display-name = "My Beautiful App"
+
+# The icons folder is where you'll place your icons.
+# 
+# The name of the image files must be specific like so:
+# "windows.ico" - windows specific app icon
+# "original.png" - when there's no platform specific icon suap falls back to this
+icons = "./assets/icons"
+
+# E.g: image/png
+mime_types = []
+
+# [project.cargo]
+# The name of the cargo binary crate to target
+# bin-crate = "roseate"
