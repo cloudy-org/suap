@@ -45,7 +45,7 @@ class Template():
 
                 remaining_keys.remove(key_name)
 
-                formatted_string.replace(
+                formatted_string = formatted_string.replace(
                     f"{{suap-{key_name}}}", str(key.value)
                 )
 
