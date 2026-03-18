@@ -4,11 +4,9 @@ import logging
 from typer import Exit
 from pathlib import Path
 
-# just so we can get the root path of our library
-import suap
-
 from ...mime_type import MimeType
 from ...projects import ProjectData
+from ...templating import Template, Key
 from ...formats import make_nsis_installer
 
 __all__ = (
@@ -38,56 +36,62 @@ def format_config_and_make_nsis_installer(
     temp_folder_path.mkdir(exist_ok = True)
     nsis_installer_script_path = temp_folder_path.joinpath("nsis_installer.nsi")
 
-    templates_path = Path(suap.__file__).parent.joinpath("templates")
-    installer_script_template_path = templates_path.joinpath("nsis_installer_script.nsi")
-
-    logger.debug(
-        f"Opening and reading NSIS template installer script at '{installer_script_template_path}'..."
-    )
-
-    with open(installer_script_template_path, mode = "r") as file:
-        installer_script_string = file.read()
-
-    logger.debug("Formatting template and creating custom install script...")
+    installer_script_template = Template("nsis_installer_script.nsi")
 
     semver = project_data.version
-    display_name = display_name if display_name is not None else project_data.name
 
-    replace_map: dict[str, str] = {
-        "suap-binary-name": binary_name,
-        "suap-binary-path": str(binary_path.absolute()),
-        "suap-binary-dist-path": str(binary_dist_path.absolute()),
-        "suap-display-name": display_name,
-        "suap-icon-path": str(icon_path.absolute()),
-        "suap-icon-file-name": icon_path.name,
+    binary_name_key = Key("binary-name", binary_name)
 
-        "suap-project-name": project_data.name,
-        "suap-project-version": f"{semver.major}.{semver.minor}.{semver.patch}" \
-            f".{semver.prerelease.split('.')[-1] if semver.prerelease is not None else 0}",
-        "suap-project-description": project_data.description,
+    display_name_key = Key(
+        name = "display-name",
+        value = display_name if display_name is not None else project_data.name
+    )
 
-        "suap-app-capabilities-macro": generate_app_capabilities_macro(
-            mime_types,
-            templates_path,
-            binary_name,
-            display_name,
-            icon_path,
-            project_data,
-            uninstall = False,
-        ),
-        "suap-app-capabilities-uni-macro": generate_app_capabilities_macro(
-            mime_types,
-            templates_path,
-            binary_name,
-            display_name,
-            icon_path,
-            project_data,
-            uninstall = True,
-        ),
-    }
+    icon_file_name_key = Key("icon-file-name", icon_path.name)
 
-    for (suap_key, value) in replace_map.items():
-        installer_script_string = installer_script_string.replace(f"{{{suap_key}}}", value)
+    installer_script_string = installer_script_template.format(
+        keys = (
+            binary_name_key,
+            Key("binary-path", str(binary_path.absolute())),
+            Key("binary-dist-path", str(binary_dist_path.absolute())),
+
+            display_name_key,
+
+            Key("icon-path", str(icon_path.absolute())),
+            icon_file_name_key,
+
+            Key("project-name", project_data.name),
+            Key(
+                "project-version",
+                f"{semver.major}.{semver.minor}.{semver.patch}" \
+                    f".{semver.prerelease.split('.')[-1] if semver.prerelease is not None else 0}"
+            ),
+            Key("project-description", project_data.description),
+
+            Key(
+                name = "app-capabilities-macro",
+                value = generate_app_capabilities_macro(
+                    mime_types,
+                    binary_name_key,
+                    display_name_key,
+                    icon_file_name_key,
+                    project_data,
+                    uninstall = False,
+                )
+            ),
+            Key(
+                name = "app-capabilities-uni-macro",
+                value = generate_app_capabilities_macro(
+                    mime_types,
+                    binary_name_key,
+                    display_name_key,
+                    icon_file_name_key,
+                    project_data,
+                    uninstall = True,
+                )
+            ),
+        )
+    )
 
     logger.debug(
         f"Creating and writing to custom NSIS installer script at '{nsis_installer_script_path}'..."
@@ -103,22 +107,21 @@ def format_config_and_make_nsis_installer(
 
 def generate_app_capabilities_macro(
     mime_types: list[MimeType],
-    templates_path: Path,
-    binary_name: str,
-    display_name: str,
-    icon_path: Path,
+    binary_name_key: Key,
+    display_name_key: Key,
+    icon_file_name_key: Key,
     project_data: ProjectData,
     uninstall: bool,
 ) -> str:
     if len(mime_types) == 0:
         return ""
 
-    app_capabilities_template_path = templates_path.joinpath(
-        "nsis_app_capabilities_uni_macro.nsi" if uninstall else "nsis_app_capabilities_macro.nsi"
-    )
+    template_name = "nsis_app_capabilities_macro.nsi"
 
-    with open(app_capabilities_template_path, mode = "r") as file:
-        app_capabilities_macro_string = file.read()
+    if uninstall:
+        template_name = "nsis_app_capabilities_uni_macro.nsi"
+
+    app_capabilities_template = Template(template_name)
 
     file_associations_and_types_lines = []
 
@@ -133,7 +136,7 @@ def generate_app_capabilities_macro(
 
         if not uninstall:
             file_associations_and_types_lines.append(
-                f'WriteRegStr HKCR "Applications\\{binary_name}.exe\\SupportedTypes" "{file_extension}" ""'
+                f'WriteRegStr HKCR "Applications\\{binary_name_key.name}.exe\\SupportedTypes" "{file_extension}" ""'
             )
 
             file_associations_and_types_lines.append(
@@ -146,35 +149,26 @@ def generate_app_capabilities_macro(
 
         else:
             file_associations_and_types_lines.append(
-                f'DeleteRegValue HKCR "Applications\\{binary_name}.exe\\SupportedTypes" "{file_extension}"'
+                f'DeleteRegValue HKCR "Applications\\{binary_name_key.name}.exe\\SupportedTypes" "{file_extension}"'
             )
 
             file_associations_and_types_lines.append(
                 f'DeleteRegValue HKCR "{file_extension}\\OpenWithProgIds" "Cloudy.{project_name}.1"'
             )
 
-    replace_map: dict[str, str] = {
-        "suap-binary-name": binary_name,
-        "suap-display-name": display_name,
-        "suap-icon-file-name": icon_path.name,
-
-        "suap-project-name": project_data.name,
-        "suap-project-description": project_data.description,
-
-        "suap-file-associations-and-types-macro": "\n".join(file_associations_and_types_lines),
-    }
-
-    for (suap_key, value) in replace_map.items():
-        app_capabilities_macro_string = app_capabilities_macro_string.replace(
-            f"{{{suap_key}}}", value
+    app_capabilities_macro_string = app_capabilities_template.format(
+        keys = (
+            binary_name_key,
+            display_name_key,
+            icon_file_name_key,
+            Key("project-name", project_data.name),
+            Key("project-description", project_data.description),
+            Key("file-associations-and-types-macro", value = "\n".join(file_associations_and_types_lines)),
         )
+    )
 
     formatted_macro_string = "".join([
         f"    {line}" for line in app_capabilities_macro_string.splitlines(keepends = True)
     ])
-
-    logger.debug(
-        f"Generated and formatted app capabilities macro: \n{formatted_macro_string}"
-    )
 
     return formatted_macro_string

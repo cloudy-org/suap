@@ -1,5 +1,4 @@
-from typing import Optional
-
+import typer
 import shutil
 import logging
 from pathlib import Path
@@ -10,7 +9,7 @@ __all__ = ()
 
 logger = logging.getLogger(__name__)
 
-def get_platform_icon_path(icons_path: Path, platform_format: PlatformFormat) -> Optional[Path]:
+def get_platform_icon_path(icons_path: Path, platform_format: PlatformFormat) -> Path:
     """
     Returns `None` if an icon can't be found / doesn't exist. Otherwise a `Path` is returned.
     """
@@ -42,14 +41,20 @@ def get_platform_icon_path(icons_path: Path, platform_format: PlatformFormat) ->
             )
 
             if platform_format & PlatformFormat.WINDOWS:
-                logger.warning(
-                    "You will MOST LIKELY want a platform specific icon for Windows "\
-                        "(e.g: 'windows.ico') as support for PNGs are a gray area and can cause problems."
+                logger.error(
+                    "Platform specific icon is REQUIRED for WINDOWS platform! A " \
+                    f"'windows.ico' file must be provided in your icons folder ({icons_path})."
                 )
+
+                raise typer.Exit(1)
 
             return original_icon_path
 
-    return None
+    logger.error(
+        "At least an original icon is required in your icons " \
+            f"path at '{icons_path}' (e.g: 'original.png')!"
+    )
+    raise typer.Exit(1)
 
 def format_icon_with_project_name(
     icon_path: Path,

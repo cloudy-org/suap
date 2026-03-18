@@ -73,6 +73,8 @@ def package(
         )
         raise Exit(1)
 
+    # TODO: move this and other processed and 
+    # checked data into some sort of object / class 
     icons_path = Path(icons_config_path)
 
     if not icons_path.exists():
@@ -81,13 +83,6 @@ def package(
         raise Exit(1)
 
     platform_icon_path = get_platform_icon_path(icons_path, platform_format)
-
-    if platform_icon_path is None:
-        logger.error(
-            "At least an original icon is required in your icons " \
-                f"path at '{icons_config_path}' (e.g: 'original.png')!"
-        )
-        raise Exit(1)
 
     if project == ProjectType.CARGO:
         projects_config_data: Optional[ConfigProjectData] = config_data.get("project", None)
@@ -121,7 +116,12 @@ def package(
             )
             raise Exit(1)
 
-        if not build_cargo_project(toolchain_name, project_data.name):
+        if not build_cargo_project(
+            toolchain_name,
+            project_data.name,
+            platform_icon_path,
+            temp_folder_path
+        ):
             raise Exit(1)
 
         cargo_release_path = Path(f"./target/{toolchain_name}/release")
