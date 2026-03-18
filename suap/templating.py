@@ -3,6 +3,8 @@ import logging
 from pathlib import Path
 from dataclasses import dataclass
 
+from .errors import TemplateKeysRemainingError
+
 __all__ = ()
 
 logger = logging.getLogger(__name__)
@@ -11,13 +13,6 @@ logger = logging.getLogger(__name__)
 class Key:
     name: str
     value: str
-
-class TemplateKeysRemainingError(Exception):
-    def __init__(self, remaining_keys: set[str]):
-        super().__init__(
-            "There are keys defined in the template " \
-                f"that were not formatted! Remaining Keys: {remaining_keys}"
-        )
 
 class Template():
     def __init__(self, template_name: str):
@@ -30,8 +25,6 @@ class Template():
 
         self.__defined_suap_keys: set[str] = set(defined_suap_keys_list)
 
-        print(f"--> {self.__defined_suap_keys}")
-
     def format(self, keys: tuple[Key, ...]) -> str:
         formatted_string = self.__template_string
 
@@ -39,14 +32,15 @@ class Template():
 
         for key in keys:
             key_name = key.name
+            key_value = str(key.value)
 
             if key_name in remaining_keys:
-                logger.debug(f"Formatting template key '{key_name}'...")
+                logger.debug(f"Formatting template key '{key_name}' with value '{key_value}'...")
 
                 remaining_keys.remove(key_name)
 
                 formatted_string = formatted_string.replace(
-                    f"{{suap-{key_name}}}", str(key.value)
+                    f"{{suap-{key_name}}}", key_value
                 )
 
         if len(remaining_keys) > 0:

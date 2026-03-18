@@ -1,6 +1,7 @@
 import re
 import typer
 import logging
+
 from ...projects import ProjectData
 
 __all__ = ()
@@ -23,9 +24,7 @@ def check_project_data_validity(project_data: ProjectData) -> None:
         raise typer.Exit(1)
 
     if any(char.isupper() for char in project_name):
-        logger.error(
-            "Project name must be all lowercase!"
-        )
+        logger.error("Project name must be all lowercase!")
 
         raise typer.Exit(1)
 

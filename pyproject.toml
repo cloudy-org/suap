@@ -15,7 +15,8 @@ suap = "suap.main:app"
 [dependency-groups]
 dev = [
     "ty>=0.0.23",
-    "ruff>=0.15.6"
+    "ruff>=0.15.6",
+    "pytest>=9.0.2",
 ]
 
 [build-system]

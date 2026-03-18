@@ -6,8 +6,8 @@ from pathlib import Path
 
 from ...mime_type import MimeType
 from ...projects import ProjectData
-from ...formats import make_nsis_installer
 from ...templating import Template, Key
+from ...formats import make_nsis_installer
 
 __all__ = (
     "format_config_and_make_nsis_installer",
@@ -40,33 +40,33 @@ def format_config_and_make_nsis_installer(
 
     semver = project_data.version
 
-    binary_name_key = Key(name = "binary-name", value = binary_name)
+    binary_name_key = Key("binary-name", binary_name)
 
     display_name_key = Key(
         name = "display-name",
         value = display_name if display_name is not None else project_data.name
     )
 
-    icon_file_name_key = Key(name = "icon-file-name", value = icon_path.name)
+    icon_file_name_key = Key("icon-file-name", icon_path.name)
 
     installer_script_string = installer_script_template.format(
         keys = (
             binary_name_key,
-            Key(name = "binary-path", value = str(binary_path.absolute())),
-            Key(name = "binary-dist-path", value = str(binary_dist_path.absolute())),
+            Key("binary-path", str(binary_path.absolute())),
+            Key("binary-dist-path", str(binary_dist_path.absolute())),
 
             display_name_key,
 
-            Key(name = "icon-path", value = str(icon_path.absolute())),
+            Key("icon-path", str(icon_path.absolute())),
             icon_file_name_key,
 
-            Key(name = "project-name", value = project_data.name),
+            Key("project-name", project_data.name),
             Key(
-                name = "project-version",
-                value = f"{semver.major}.{semver.minor}.{semver.patch}" \
+                "project-version",
+                f"{semver.major}.{semver.minor}.{semver.patch}" \
                     f".{semver.prerelease.split('.')[-1] if semver.prerelease is not None else 0}"
             ),
-            Key(name = "project-description", value = project_data.description),
+            Key("project-description", project_data.description),
 
             Key(
                 name = "app-capabilities-macro",
@@ -170,9 +170,5 @@ def generate_app_capabilities_macro(
     formatted_macro_string = "".join([
         f"    {line}" for line in app_capabilities_macro_string.splitlines(keepends = True)
     ])
-
-    logger.debug(
-        f"Generated and formatted app capabilities macro: \n{formatted_macro_string}"
-    )
 
     return formatted_macro_string
