@@ -16,6 +16,7 @@
 - **[NSIS](https://nsis.sourceforge.io/Main_Page)** (for packaging windows installers)
 - **[Rust](https://www.rust-lang.org/tools/install)** and **Cargo** (for packaging cargo projects).
   - **[x86_64-pc-windows-gnu](https://doc.rust-lang.org/nightly/rustc/platform-support/windows-gnu.html)** (for building windows binaries)
+- **[mingw-w64-binutils](https://archlinux.org/packages/extra/x86_64/mingw-w64-binutils/)** (required for embedding windows icons onto executables)
 
 ## Packaging Usage
 
