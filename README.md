@@ -40,14 +40,14 @@ name: Suap Package & Publish Binaries on Release Tag
 python -m venv .venv
 source .venv/bin/activate
 
-pip install git+https://github.com/cloudy-org/suap@v0.1.0-alpha.2
+pip install git+https://github.com/cloudy-org/suap@v0.1.0-beta.1
 
 suap --help
 ```
 
 ### UV Install
 ```sh
-uv tool install --from git+https://github.com/cloudy-org/suap@v0.1.0-alpha.2 suap
+uv tool install --from git+https://github.com/cloudy-org/suap@v0.1.0-beta.1 suap
 
 uvx suap --help
 ```
