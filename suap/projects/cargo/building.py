@@ -78,6 +78,8 @@ def build_cargo_project(
 def build_windows_resource_file(icon_path: Path, temp_folder_path: Path) -> Optional[Path]:
     logger.debug("Building windows resource file...")
 
+    temp_folder_path.mkdir(exist_ok = True)
+
     resource_file_path = temp_folder_path.joinpath("resource.rc")
     compiled_resource_binary_path = temp_folder_path.joinpath("resource.res")
 
