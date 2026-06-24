@@ -5,6 +5,7 @@ import logging
 from pathlib import Path
 from subprocess import check_call, CalledProcessError
 
+from ...platform_arch import PlatformArch
 from ...platform_format import PlatformFormat
 
 __all__ = (
@@ -14,14 +15,21 @@ __all__ = (
 
 logger = logging.getLogger(__name__)
 
-def get_cargo_toolchain(platform_format: PlatformFormat) -> Optional[str]:
+def get_cargo_toolchain(platform_format: PlatformFormat, platform_arch: PlatformArch) -> Optional[str]:
     toolchain_name: Optional[str] = None
 
     if platform_format & PlatformFormat.LINUX:
-        toolchain_name = "x86_64-unknown-linux-gnu"
+
+        if platform_arch == PlatformArch.X86_64:
+            toolchain_name = "x86_64-unknown-linux-gnu"
+
+        elif platform_arch == PlatformArch.AARCH64:
+            toolchain_name = "aarch64-unknown-linux-gnu"
 
     elif platform_format & PlatformFormat.WINDOWS:
-        toolchain_name = "x86_64-pc-windows-gnu"
+
+        if platform_arch == PlatformArch.X86_64:
+            toolchain_name = "x86_64-pc-windows-gnu"
 
     elif platform_format & PlatformFormat.MACOS:
         # TODO: add and test macos support

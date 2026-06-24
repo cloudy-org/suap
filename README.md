@@ -64,7 +64,7 @@ suap --help
 
 ### Packaging
 ```sh
-suap package --project cargo --platform-format windows
+suap package --project cargo --platform-format windows --platform-arch x86_64
 ```
 
 #### Project
@@ -115,4 +115,4 @@ The `./dist` folder:
 *Readme Work In Progress...*
 
 
-[uploading-bins-covention]: https://github.com/cloudy-org/.github/blob/main/convention/releases.md#the-convention-of-uploading-binaries
+[uploading-bins-covention]: https://cloudy-org.github.io/wiki/development/conventions/releases/#the-convention-of-uploading-binaries
