@@ -31,9 +31,9 @@ name: Suap Package & Publish Binaries on Release Tag
 
 > [!WARNING]
 > Suap is not really designed for usage in a development environment but 
-> rather in CI. You would only really want to use it during development for testing.
+> rather in CI. You would only really want to use it during development for final testing.
 > 
-> Suap targets Python **3.13** support and currently only supports **Linux** (this may or may not change).
+> Suap targets Python **3.13** and only supports **Linux** environments.
 
 ### Pip Install
 ```sh
