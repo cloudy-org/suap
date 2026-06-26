@@ -5,7 +5,6 @@ import logging
 from pathlib import Path
 from subprocess import check_call, CalledProcessError
 
-from ...docker import INSIDE_DOCKER
 from ...platform_arch import PlatformArch
 from ...platform_format import PlatformFormat
 
