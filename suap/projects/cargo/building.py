@@ -5,6 +5,7 @@ import logging
 from pathlib import Path
 from subprocess import check_call, CalledProcessError
 
+from ...docker import INSIDE_DOCKER
 from ...platform_arch import PlatformArch
 from ...platform_format import PlatformFormat
 
@@ -40,6 +41,7 @@ def get_cargo_toolchain(platform_format: PlatformFormat, platform_arch: Platform
 def build_cargo_project(
     toolchain_name: str,
     cargo_crate_name: str,
+    cargo_target_path: Path,
     icon_path: Path,
     temp_folder_path: Path,
     cwd_path: Path,
@@ -48,6 +50,8 @@ def build_cargo_project(
 
     try:
         default_env = os.environ.copy()
+
+        default_env["CARGO_TARGET_DIR"] = str(cargo_target_path.absolute())
 
         rust_flags = ["-Awarnings"] # hides warnings in console
 

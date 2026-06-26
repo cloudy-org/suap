@@ -123,18 +123,24 @@ def package(
             )
             raise Exit(1)
 
+        cargo_target_path = cwd_path.joinpath("target")
+
+        if INSIDE_DOCKER:
+            # use our own isolated target directory instead 
+            # of './target' if running inside docker container.
+            cargo_target_path = cargo_target_path.joinpath("suap-docker")
+
         if not build_cargo_project(
             toolchain_name,
             project_data.name,
+            cargo_target_path,
             platform_icon_path,
             temp_folder_path,
             cwd_path
         ):
             raise Exit(1)
 
-        cargo_release_path = cwd_path.joinpath(
-            Path(f"./target/{toolchain_name}/release")
-        )
+        cargo_release_path = cargo_target_path.joinpath(toolchain_name, "release")
 
         binary_name = bin_output_name if bin_output_name is not None else project_data.name
 

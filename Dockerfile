@@ -15,6 +15,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc-mingw-w64-x86-64 \
     binutils-mingw-w64
 
+RUN dpkg --add-architecture arm64
+
+RUN apt-get install -y --no-install-recommends \
+    libc6-dev-arm64-cross \
+    gcc-aarch64-linux-gnu
+
 # thank FUCK Debain stated including "rustup" in the apt repos in debain 13 🙏
 
 RUN rustup toolchain install 1.89 --profile minimal \
