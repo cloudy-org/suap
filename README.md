@@ -62,10 +62,10 @@ From here on you can query the help command for various actions you can perform 
 suap --help
 ```
 
-### Docker
+### Use Docker
 By default suap runs it's commands in your environment. However your Linux environment is different to other user's Linux environments. For example an Arch Linux system is notorious for having newer glibc versions than Debian; this can cause problems when for example running an aarch64 binary compiled on an Arch system on a Raspberry Pi 4 running Debian.
 
-Telling suap to run it's commands inside it's docker container helps solve such problems and improves reproducibility.
+Telling suap to run it's commands inside it's docker container helps solve such problems and improves reproducibility. The container also comes preinstalled with all necessary dependencies.
 
 All you got to do is append a `-d` or `--docker` and suap will use the **[`devgoldy/suap`](https://hub.docker.com/r/devgoldy/suap/tags)** image:
 
