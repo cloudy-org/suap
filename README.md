@@ -13,6 +13,7 @@
 > Suap is in alpha testing stage at the moment, feel free to submit PRs to improve my shit Python code in this project. Thanks
 
 ### Prerequisites:
+Assuming you're on Linux:
 - **[NSIS](https://nsis.sourceforge.io/Main_Page)** (for packaging windows installers)
 - **[Rust](https://www.rust-lang.org/tools/install)** and **Cargo** (for packaging cargo projects).
   - **[x86_64-pc-windows-gnu](https://doc.rust-lang.org/nightly/rustc/platform-support/windows-gnu.html)** (for building windows binaries)
@@ -30,24 +31,23 @@ name: Suap Package & Publish Binaries on Release Tag
 ```
 
 > [!WARNING]
-> Suap is not really designed for usage in a development environment but 
-> rather in CI. You would only really want to use it during development for final testing.
+> Suap is only designed for use in CI and Docker. You would only really want to use it during development for final testing.
 > 
-> Suap targets Python **3.13** and only supports **Linux** environments.
+> Suap targets Python **3.13** and only supports **Linux** environments. The docker image also only supports **x86_64**.
 
 ### Pip Install
 ```sh
 python -m venv .venv
 source .venv/bin/activate
 
-pip install git+https://github.com/cloudy-org/suap@v0.1.0-beta.2
+pip install git+https://github.com/cloudy-org/suap@v0.1.0-beta.3
 
 suap --help
 ```
 
 ### UV Install
 ```sh
-uv tool install --from git+https://github.com/cloudy-org/suap@v0.1.0-beta.2 suap
+uv tool install --from git+https://github.com/cloudy-org/suap@v0.1.0-beta.3 suap
 
 uvx suap --help
 ```
@@ -60,6 +60,17 @@ From here on you can query the help command for various actions you can perform 
 
 ```sh
 suap --help
+```
+
+### Docker
+By default suap runs it's commands in your environment. However your Linux environment is different to other user's Linux environments. For example an Arch Linux system is notorious for having newer glibc versions than Debian; this can cause problems when for example running an aarch64 binary compiled on an Arch system on a Raspberry Pi 4 running Debian.
+
+Telling suap to run it's commands inside it's docker container helps solve such problems and improves reproducibility.
+
+All you got to do is append a `-d` or `--docker` and suap will use the **[`devgoldy/suap`](https://hub.docker.com/r/devgoldy/suap/tags)** image:
+
+```sh
+suap -d package --project cargo --platform-format windows --platform-arch x86_64
 ```
 
 ### Packaging

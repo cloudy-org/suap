@@ -41,7 +41,8 @@ def build_cargo_project(
     toolchain_name: str,
     cargo_crate_name: str,
     icon_path: Path,
-    temp_folder_path: Path
+    temp_folder_path: Path,
+    cwd_path: Path,
 ) -> bool:
     logger.debug(f"Invoking 'cargo build' with toolchain '{toolchain_name}'...")
 
@@ -71,7 +72,8 @@ def build_cargo_project(
                 "--target",
                 toolchain_name
             ],
-            env = default_env
+            env = default_env,
+            cwd = cwd_path,
         )
 
     except CalledProcessError as error:

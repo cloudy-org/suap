@@ -5,7 +5,7 @@ from typer import Option, Typer
 
 from .logger import LogFormatter
 
-from .commands import version, packaging
+from .commands import version, docker, packaging
 
 app = Typer(
     pretty_exceptions_show_locals = False
@@ -25,6 +25,14 @@ def callback(
             help = "Show suap version."
         )
     ] = None,
+    docker: Annotated[
+        bool,
+        Option(
+            "-d", "--docker",
+            callback = docker.docker_callback,
+            help = "Run these suap commands in a docker container instead of your host environment."
+        )
+    ] = False,
 ):
     log_handler = logging.StreamHandler()
     log_handler.setFormatter(LogFormatter())

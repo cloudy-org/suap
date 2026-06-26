@@ -15,6 +15,7 @@ from .nsis import format_config_and_make_nsis_installer
 from .icons import get_platform_icon_path, format_icon_with_project_name
 
 from ...mime_type import MimeType
+from ...docker import INSIDE_DOCKER
 from ...config import get_config_data
 from ...project_type import ProjectType
 from ...platform_arch import PlatformArch
@@ -49,18 +50,18 @@ def package(
 ):
     platform_format: PlatformFormat = platform_format.get_platform_format()
 
-    current_working_directory = Path(os.getcwd())
+    cwd_path = Path("/suap-docker-cwd" if INSIDE_DOCKER else os.getcwd())
 
-    dist_folder_path = current_working_directory.joinpath("dist")
-    temp_folder_path = current_working_directory.joinpath("temp")
+    dist_folder_path = cwd_path.joinpath("dist")
+    temp_folder_path = cwd_path.joinpath("temp")
 
     logger.debug("Getting config data...")
-    config_data = get_config_data(current_working_directory)
+    config_data = get_config_data(cwd_path)
 
     if config_data is None:
         logger.error(
             "'suap.toml' does not exist in this current " \
-                f"working directory! (Project Root: {current_working_directory})"
+                f"working directory! (Project Root: {cwd_path})"
         )
         raise Exit(1)
 
@@ -81,7 +82,7 @@ def package(
 
     # TODO: move this and other processed and 
     # checked data into some sort of object / class 
-    icons_path = Path(icons_config_path)
+    icons_path = cwd_path.joinpath(Path(icons_config_path))
 
     if not icons_path.exists():
         logger.error(f"Icons folder path does not exist ('{icons_path}')!")
@@ -106,7 +107,7 @@ def package(
             raise Exit(1)
 
         logger.info("Getting cargo project data...")
-        project_data = find_and_get_cargo_project_data(cargo_crate_name)
+        project_data = find_and_get_cargo_project_data(cargo_crate_name, cwd_path)
 
         if project_data is None:
             raise Exit(1)
@@ -126,11 +127,14 @@ def package(
             toolchain_name,
             project_data.name,
             platform_icon_path,
-            temp_folder_path
+            temp_folder_path,
+            cwd_path
         ):
             raise Exit(1)
 
-        cargo_release_path = Path(f"./target/{toolchain_name}/release")
+        cargo_release_path = cwd_path.joinpath(
+            Path(f"./target/{toolchain_name}/release")
+        )
 
         binary_name = bin_output_name if bin_output_name is not None else project_data.name
 
@@ -187,3 +191,41 @@ def package(
         shutil.rmtree(temp_folder_path, ignore_errors = True)
 
     logger.info("This command is WIP!")
+
+@app.command()
+def package_all(
+    project: Annotated[ProjectType, Option(help = "Which project should we package (e.g: the cargo project, python project?).")],
+    bin_output_name: Annotated[
+        Optional[str],
+        Option(
+            help = "Override the default binary name prefixed in front of the binary suffix " \
+                "(e.g: 'bin-name-linux-x86_64', 'bin-name-win-x86_64-setup.exe', 'bin-name-macos-x86_64')."
+        )
+    ] = None,
+    remove_temp: bool = True,
+):
+    all_platform_options = [
+        PlatformFormatOption.LINUX,
+        PlatformFormatOption.WINDOWS
+    ]
+
+    for platform_format_option in all_platform_options:
+
+        for platform_arch in PlatformArch:
+            logger.info(
+                f"Packaging '{platform_arch.name}' architecture for '{platform_format_option.name}' platform..."
+            )
+
+            try: 
+                package(
+                    project = project,
+                    platform_format = platform_format_option,
+                    platform_arch = platform_arch,
+                    bin_output_name = bin_output_name,
+                    remove_temp = remove_temp
+                )
+
+            except Exit as e:
+                logger.error(f"Exited with typer error '{e}', continuing to next arch and platform...")
+
+    logger.info("Done packaging all platforms and architectures!")
