@@ -13,7 +13,7 @@
 > Suap is in alpha testing stage at the moment, feel free to submit PRs to improve my shit Python code in this project. Thanks
 
 ### Prerequisites:
-Assuming you're on Linux:
+Assuming you're on Linux (you don't need any of this for docker mode):
 - **[NSIS](https://nsis.sourceforge.io/Main_Page)** (for packaging windows installers)
 - **[Rust](https://www.rust-lang.org/tools/install)** and **Cargo** (for packaging cargo projects).
   - **[x86_64-pc-windows-gnu](https://doc.rust-lang.org/nightly/rustc/platform-support/windows-gnu.html)** (for building windows binaries)
