@@ -13,13 +13,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     nsis \
     gcc-mingw-w64-x86-64 \
-    binutils-mingw-w64
+    binutils-mingw-w64 \
+    pkg-config
 
 RUN dpkg --add-architecture arm64
 
 RUN apt-get install -y --no-install-recommends \
     libc6-dev-arm64-cross \
     gcc-aarch64-linux-gnu
+
+# additional linux libraries we may require when compiling some applications
+RUN apt-get install -y --no-install-recommends \
+    libdav1d-dev
 
 # thank FUCK Debain stated including "rustup" in the apt repos in debain 13 🙏
 
